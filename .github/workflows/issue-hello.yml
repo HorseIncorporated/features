@@ -1,0 +1,30 @@
+name: Issue Hello World
+
+on:
+  issues:
+    types: [opened]
+
+#
+
+jobs:
+  sayHello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo "Hello World"
+        run: echo "Hello World! A new issue was just created."
+
+  runCodeGeneration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install gh cli
+        run: sudo apt-get install gh -y
+      - name: Authenticate gh cli
+        run: |
+          echo  ${{ secrets.GH_PAT }} | gh auth login -p https --with-token
+          gh auth status
+      - name: Make .sandbox
+        run: |
+          mkdir -p .sandbox && cd .sandbox
+      - name: clone workspace repo
+        run: |
+          git clone https://github.com/HorseIncorporated/workspace.git
