@@ -1,2 +1,7 @@
 # features
-devcontainer features
+
+## tests
+
+```shell
+devcontainer features test
+```
