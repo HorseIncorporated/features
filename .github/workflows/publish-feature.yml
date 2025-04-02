@@ -1,40 +1,47 @@
-name: Publish DevContainer Feature
-
+name: "Release dev container features & Generate Documentation"
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: "Publish Features"
+        uses: devcontainers/action@v1
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_PAT }}
+          publish-features: "true"
+          base-path-to-features: "./src"
+          generate-docs: "true"
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: Install Devcontainers CLI
-        run: npm install -g @devcontainers/cli
-
-      - name: Publish Dev Container Features
+      - name: Create PR for Documentation
+        id: push_image_info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          devcontainer features publish \
-            --collection-id "features" \
-            --registry "ghcr.io" \
-            --namespace "${{ github.repository_owner }}" \
-            --password "${{ secrets.GH_PAT }}"
-
-      - name: Done
-        run: echo "Successfully published Dev Container Feature(s) to GHCR!"
+          set -e
+          echo "Start."
+          # Configure git and Push updates
+          git config --global user.email github-actions[bot]@users.noreply.github.com
+          git config --global user.name github-actions[bot]
+          git config pull.rebase false
+          branch=automated-documentation-update-$GITHUB_RUN_ID
+          git checkout -b $branch
+          message='Automated documentation update'
+          # Add / update and commit
+          git add */**/README.md
+          git commit -m 'Automated documentation update [skip ci]' || export NO_UPDATES=true
+          # Push
+          if [ "$NO_UPDATES" != "true" ] ; then
+              git push origin "$branch"
+              gh pr create --title "$message" --body "$message"
+          fi
