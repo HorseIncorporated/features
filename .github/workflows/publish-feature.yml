@@ -25,16 +25,16 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PAT }}
 
-      - name: Build and Publish Dev Container Features
-        uses: devcontainers/ci@v0.3
-        with:
-          push: always
-          runCmd: |
-            devcontainer features publish \
-              --collection-id "features" \
-              --registry "ghcr.io" \
-              --namespace "${{ github.repository_owner }}" \
-              --password "${{ secrets.GH_PAT }}"
+      - name: Install Devcontainers CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Publish Dev Container Features
+        run: |
+          devcontainer features publish \
+            --collection-id "features" \
+            --registry "ghcr.io" \
+            --namespace "${{ github.repository_owner }}" \
+            --password "${{ secrets.GH_PAT }}"
 
       - name: Done
         run: echo "Successfully published Dev Container Feature(s) to GHCR!"
