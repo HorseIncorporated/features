@@ -2,7 +2,7 @@
   "id": "coder",
   "version": "1.0.0",
   "name": "coder",
-  "description": "coding agents via devcontainer feature",
+  "description": "coding agent via devcontainer feature",
   "options": {
     "OPENAI_API_KEY": {
       "type": "string",
