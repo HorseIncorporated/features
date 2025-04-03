@@ -23,4 +23,4 @@ jobs:
         run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u HorseIncorporated --password-stdin
 
       - name: pre-build feature and publish
-        run: devcontainer features publish -n HorseIncorporated/features
+        run: devcontainer features publish . -n HorseIncorporated/features
