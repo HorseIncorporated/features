@@ -19,7 +19,8 @@ jobs:
           publish-features: "true"
           base-path-to-features: "./src"
           generate-docs: "true"
-          
+          token: ${{ secrets.GH_PAT }}
+
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
